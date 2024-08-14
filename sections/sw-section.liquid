@@ -1,3 +1,25 @@
+<div class="page-width">
+  <div class="sw-section__content">
+    <div class="sw-section-image-wrapper">
+      <img width="" height="" src="{{ section.settings.background_image | image_url: 'master' }}" alt="">
+      <div class="sw-section-text">
+        {% for block in section.blocks %}
+          {% case block.name %}
+            {% when 'Heading' %}
+              <h2 class="sw-section-heading" style="text-align: {{ section.settings.text_alignment }}">
+                {{ block.settings.heading }}
+              </h2>
+            {% when 'Text' %}
+              <textarea name="{{block.id}}" id="{{block.id}}"> {{block.settings.text_area}}</textarea>
+            {% when 'cta-link' %}
+              <a href="{{block.settings.link_url}}" class="sw-section-link">{{ block.settings.link_text }}</a>
+          {% endcase %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
 {% schema %}
 {
   "name": "sw-section",
@@ -40,8 +62,7 @@
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Heading",
-          "info": "t:settings_schema.blocks.heading.settings.heading.info"
+          "default": "Heading"
         }
       ]
     },
@@ -52,24 +73,29 @@
       "settings": [
         {
           "type": "textarea",
-          "id": "text-area",
+          "id": "text_area",
           "label": "Text",
-          "default": "Enter text here",
-          "info": "t:settings_schema.blocks.text.settings.text-area.info"
-        },
-        {
-          "type": "textarea",
-          "id": "text-area-2",
-          "label": "Text 2",
-          "default": "Enter text here",
-          "info": "t:settings_schema.blocks.text.settings.text-area-2.info"
+          "default": "Enter text here"
         }
       ]
     },
     {
       "type": "link",
       "limit": 2,
-      "name": "cta-link"
+      "name": "cta-link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "link_text",
+          "label": "Link Text",
+          "default": "Link Text"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL"
+        }
+      ]
     }
   ],
   "presets": [
