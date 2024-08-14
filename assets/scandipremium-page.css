@@ -1,0 +1,7 @@
+.scandipremium-main{
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-inline: 1rem;
+}
