@@ -5,3 +5,24 @@
     gap: 1rem;
     padding-inline: 1rem;
 }
+
+.scandipremium-promotion{
+    display: flex;
+    .product{
+        flex:0.5;
+        img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .cta{
+        padding: 1rem;
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    }
+}

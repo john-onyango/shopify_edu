@@ -3,7 +3,7 @@
 client_id = "784be008b7681b6d7a569f01bcb4578d"
 name = "scandishop"
 handle = "scandishop"
-application_url = "https://nickel-establishing-complications-funky.trycloudflare.com"
+application_url = "https://showcase-reflections-pack-caught.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://nickel-establishing-complications-funky.trycloudflare.com/auth/callback",
-  "https://nickel-establishing-complications-funky.trycloudflare.com/auth/shopify/callback",
-  "https://nickel-establishing-complications-funky.trycloudflare.com/api/auth/callback"
+  "https://showcase-reflections-pack-caught.trycloudflare.com/auth/callback",
+  "https://showcase-reflections-pack-caught.trycloudflare.com/auth/shopify/callback",
+  "https://showcase-reflections-pack-caught.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

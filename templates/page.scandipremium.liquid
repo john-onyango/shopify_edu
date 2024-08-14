@@ -1,7 +1,114 @@
 {{ 'scandipremium-page.css' | asset_url | stylesheet_tag }}
 {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
 
-<main class="scandipremium-main">
-  {% section 'image-banner' heading:{"holla"} %}
+<main class="scandipremium-main page-width">
+  {% section 'image-banner' %}
+  <div class="scandipremium-promotion">
+    {% for collection in collections %}
+      {% if collection.title == 'Classic' %}
+        {% assign classiccollection = collection %}
+
+        {% assign product_count = classiccollection.products.size %}
+
+        {% if product_count > 0 %}
+          {% assign randomindex = 'now' | date: '%s' | modulo: product_count %}
+
+          {% assign selected_product = classiccollection.products[randomindex] %}
+
+          <div class="product">
+            <img
+              srcset="
+                {%- if selected_product.media[1].width >= 165 -%}{{ selected_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
+                {%- if selected_product.media[1].width >= 360 -%}{{ selected_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}
+                {%- if selected_product.media[1].width >= 533 -%}{{ selected_product.media[1] | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if selected_product.media[1].width >= 720 -%}{{ selected_product.media[1] | image_url: width: 720 }} 720w,{%- endif -%}
+                {%- if selected_product.media[1].width >= 940 -%}{{ selected_product.media[1] | image_url: width: 940 }} 940w,{%- endif -%}
+                {%- if selected_product.media[1].width >= 1066 -%}{{ selected_product.media[1] | image_url: width: 1066 }} 1066w,{%- endif -%}
+                {{ selected_product.media[1] | image_url }} {{ selected_product.media[1].width }}w
+              "
+              src="{{ selected_product.featured_image.src | image_url: width: 533 }}"
+              alt=""
+              class="motion-reduce"
+              loading="lazy"
+              width="{{ selected_product.media[1].width }}"
+              height="{{ selected_product.media[1].height }}"
+            >
+          </div>
+          <div class="cta">
+            <h2>
+              <a href="{{selected_product.url}}">
+                {{ selected_product.title }}
+                </a>
+            </h2>
+            {% render 'price', product: selected_product, price_class: '' %}
+            <p>
+              {{ selected_product.content }}
+            </p>
+            {% if selected_product.available == false %}
+              <button disabled="true" class="product-form__submit button button--full-width" style="cursor: not-allowed;">Add to cart</button>
+              <span>Out of stock, better luck next time!</span>
+            {% else %}
+              <button id="cart-submit-button" class="product-form__submit button button--full-width" onclick="addToCart({{selected_product.variants.first.id}})">
+                Add to cart
+              </button>
+            {% endif %}
+          </div>
+        {% else %}
+          <p>No products available in this collection.</p>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
 </main>
 
+<script defer>
+  async function addToCart(id) {
+    var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
+    var submitButton = document.getElementById('cart-submit-button');
+    console.log(cart);
+    if (submitButton.getAttribute('aria-disabled') === 'true') return;
+    submitButton.setAttribute('aria-disabled', 'true');
+    submitButton.classList.add('loading');
+
+    const config = fetchConfig('javascript');
+    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    delete config.headers['Content-Type'];
+    const formData = new FormData();
+    if (cart) {
+      formData.append(
+        'sections',
+        cart.getSectionsToRender().map((section) => section.id)
+      );
+      formData.append('sections_url', window.location.pathname);
+      formData.append('product_id', id);
+      formData.append('quantity', 1);
+      formData.append('form_type', 'product');
+      formData.append('id', '49292039422298');
+      formData.append('section-id', 'template--23229878862170__main');
+      cart.setActiveElement(document.activeElement);
+    }
+
+    config.body = formData;
+
+    fetch(`${routes.cart_add_url}`, config)
+      .then((response) => response.json())
+      .then((response) => {
+        if (!cart) {
+          window.location = window.routes.cart_url;
+          return;
+        }
+
+        cart.renderContents(response);
+      })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => {
+        submitButton.classList.remove('loading');
+        cart.classList.remove('is-empty');
+        submitButton.removeAttribute('aria-disabled');
+      });
+  }
+</script>

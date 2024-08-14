@@ -1,0 +1,84 @@
+<style>
+   all-products {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+  all-products .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--items-per-row), 1fr);
+    gap: 1rem;
+  }
+
+</style>
+
+{% assign remaining_products = '' %}
+{% for product in collections.all.products offset: section.settings.product_per_row %}
+  {% assign remaining_products = remaining_products | append: product.handle %}
+  {% unless forloop.last %}
+    {% assign remaining_products = remaining_products | append: ',' %}
+  {% endunless %}
+{% endfor %}
+<div class="page-width">
+  <all-products data-remaining-products="{{remaining_products}}">
+    <div class="grid" style="--items-per-row:{{section.settings.product_per_row}}">
+      {% for product in collections.all.products limit: section.settings.product_per_row %}
+        {% render 'card-product', card_card_product: product %}
+      {% endfor %}
+    </div>
+  </all-products>
+  <button class="button">Load more</button>
+</div>
+
+<script
+  defer
+>
+   class AllProducts extends HTMLElement{
+    index=0;
+    constructor(){
+        super();
+        this.loadMoreButton = this.querySelector('button');
+        this.productsPerRow = +this.dataset.productsPerRow;
+        this.remainingProducts = this.dataset.remainingProducts.split(',');
+        this.grid = this.querySelector('.grid');
+
+        this.loadMoreButton.addEventListener('click', this.loadMoreProucts.bind(this));
+        console.log(this.remainingProducts);
+    }
+     this.loadMoreButton.addAtribute('disabled', true);
+   async loadMoreProucts(){
+        const productsToLoad = this.remainingProducts.slice(this.index, this.index + this.productsPerRow);
+    const products = await Promise.all(
+    productsToLoad.map(async handle => await fetch(`/products/${handle}?sections=card-product`).
+    then(response => response.json())
+    .then(data => data['card-product'])));    
+
+    products.forEach(product => {
+        this.grid.innerHTML += product;
+    });
+
+    this.index += this.productsPerRow;
+
+    if(this.index >= this.remainingProducts.length){
+        this.loadMoreButton.remove();
+    }
+    this.loadMoreButton.removeAttribute('disabled');
+}
+    customElements.define('all-products', AllProducts);
+   }
+</script>
+
+{% schema %}
+{
+  "name": "All products",
+  "settings": [
+    {
+      "type": "number",
+      "id": "product_per_row",
+      "label": "Products per row"
+    }
+  ],
+  "presets": [{ "name": "All products" }]
+}
+{% endschema %}

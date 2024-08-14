@@ -1,0 +1,81 @@
+{% schema %}
+{
+  "name": "sw-section",
+  "tag": "section",
+  "class": "sw-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "limit": 1,
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Heading",
+          "info": "t:settings_schema.blocks.heading.settings.heading.info"
+        }
+      ]
+    },
+    {
+      "type": "text-area",
+      "limit": 2,
+      "name": "Text",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text-area",
+          "label": "Text",
+          "default": "Enter text here",
+          "info": "t:settings_schema.blocks.text.settings.text-area.info"
+        },
+        {
+          "type": "textarea",
+          "id": "text-area-2",
+          "label": "Text 2",
+          "default": "Enter text here",
+          "info": "t:settings_schema.blocks.text.settings.text-area-2.info"
+        }
+      ]
+    },
+    {
+      "type": "link",
+      "limit": 2,
+      "name": "cta-link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "sw-section"
+    }
+  ]
+}
+{% endschema %}
