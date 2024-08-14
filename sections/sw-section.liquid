@@ -1,17 +1,17 @@
-<div class="page-width">
+<div class="page-width sw-section__wraper">
   <div class="sw-section__content">
     <div class="sw-section-image-wrapper">
-      <img width="" height="" src="{{ section.settings.background_image | image_url: 'master' }}" alt="">
+      <img height="{{section.settings.image-height}}" width="100%" src="{{ section.settings.background_image | image_url: 'master' }}" alt="">
       <div class="sw-section-text">
         {% for block in section.blocks %}
           {% case block.name %}
-            {% when 'Heading' %}
+            {% when 'heading' %}
               <h2 class="sw-section-heading" style="text-align: {{ section.settings.text_alignment }}">
                 {{ block.settings.heading }}
               </h2>
-            {% when 'Text' %}
+            {% when 'text-area' %}
               <textarea name="{{block.id}}" id="{{block.id}}"> {{block.settings.text_area}}</textarea>
-            {% when 'cta-link' %}
+            {% when 'link' %}
               <a href="{{block.settings.link_url}}" class="sw-section-link">{{ block.settings.link_text }}</a>
           {% endcase %}
         {% endfor %}
@@ -30,6 +30,26 @@
       "type": "image_picker",
       "id": "background_image",
       "label": "Background Image"
+    },
+    {
+      "type": "select",
+      "id": "image-height",
+      "label": "Image size",
+      "default": "80vh",
+      "options": [
+        {
+          "value": "80vh",
+          "label": "large"
+        },
+        {
+          "value": "50vh",
+          "label": "medium"
+        },
+        {
+          "value": "30vh",
+          "label": "small"
+        }
+      ]
     },
     {
       "type": "select",
