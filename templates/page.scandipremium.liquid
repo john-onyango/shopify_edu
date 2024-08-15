@@ -54,8 +54,8 @@
                     data-available="{{ variant.available }}"
                     onclick="selectVariant('{{ variant.id }}', this)"
                     title="{% unless variant.available %}Out of stock{% endunless %}"
-                    onmouseenter="updateAddToCartButton()"
-                    onmouseleave="updateAddToCartButton()"
+                    
+                    onmouseout="updateAddToCartButton()"
                   >
                     {{ variant.title }}
                   </div>
@@ -124,6 +124,7 @@
 
     element.classList.add('selected');
     selectedVariantId = id;
+    updateAddToCartButton();
   }
 
   function updateAddToCartButton() {
