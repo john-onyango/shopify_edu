@@ -26,3 +26,20 @@
         }
     }
 }
+
+.product-variants{
+    margin-block: 1rem;
+
+    .variant-option.available{
+        background-color: inherit;
+    }
+
+    .variant-option.unavailable{
+        background-color: gray;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+.selected{
+    border:3px solid black !important;
+}

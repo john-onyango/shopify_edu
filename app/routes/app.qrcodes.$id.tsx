@@ -6,6 +6,7 @@ import {
   useNavigation,
   useSubmit,
   useNavigate,
+  Form,
 } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
 import {
@@ -24,14 +25,16 @@ import {
   Thumbnail,
   BlockStack,
   PageActions,
+  Spinner,
 } from "@shopify/polaris";
-import { ImageIcon } from "@shopify/polaris-icons";
+import { EditIcon, ImageIcon } from "@shopify/polaris-icons";
 
 import db from "../db.server";
 import { getQRCode, validateQRCode } from "../models/QRCode.server";
+import { Loading } from "@shopify/polaris/build/ts/src/components/Frame/components";
 
 export async function loader({ request, params }) {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
 
   if (params.id === "new") {
     return json({
@@ -77,6 +80,9 @@ export default function QRCodeForm() {
 
   const qrCode = useLoaderData();
   const [formState, setFormState] = useState(qrCode);
+  const [editTitle, setEditTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState(qrCode.title);
+  const [loading, setLOading] = useState(false);
   const [cleanFormState, setCleanFormState] = useState(qrCode);
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
@@ -96,7 +102,8 @@ export default function QRCodeForm() {
 
     if (products) {
       const { images, id, variants, title, handle } = products[0];
-
+      setNewTitle(handle);
+      console.log(title);
       setFormState({
         ...formState,
         productId: id,
@@ -105,10 +112,13 @@ export default function QRCodeForm() {
         productHandle: handle,
         productAlt: images[0]?.altText,
         productImage: images[0]?.originalSrc,
+        newtitle: handle,
       });
     }
   }
-
+  const handleEditTitle = () => {
+    setEditTitle(!editTitle);
+  };
   const submit = useSubmit();
   function handleSave() {
     const data = {
@@ -122,6 +132,11 @@ export default function QRCodeForm() {
     setCleanFormState({ ...formState });
     submit(data, { method: "post" });
   }
+
+  const closeTitleEdit = () => {
+    setEditTitle(false);
+    setNewTitle(formState.title);
+  };
 
   return (
     <Page>
@@ -168,9 +183,81 @@ export default function QRCodeForm() {
                       source={formState.productImage || ImageIcon}
                       alt={formState.productAlt}
                     />
-                    <Text as="span" variant="headingMd" fontWeight="semibold">
-                      {formState.productTitle}
-                    </Text>
+                    {editTitle ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        }}
+                      >
+                        <Form
+                          onSubmit={() => {
+                            setLOading(true);
+                          }}
+                          method="POST"
+                          action="/updateproduct"
+                        >
+                          <TextField
+                            id="newtitle"
+                            name="newtitle"
+                            helpText="Edit title"
+                            label="new title"
+                            labelHidden
+                            autoComplete="off"
+                            value={formState.newtitle ?? formState.productTitle}
+                            onChange={(newtitle) => {
+                              setNewTitle(newtitle);
+                              setFormState({ ...formState, newtitle });
+                            }}
+                            error={errors.newtitle}
+                          />
+                          <input
+                            type="hidden"
+                            name="productId"
+                            value={formState.productId}
+                          />
+                          {loading ? (
+                            <Spinner size="small" />
+                          ) : (
+                            <>
+                              <button
+                                type="submit"
+                                className="
+                              Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter                          "
+                                style={{ marginRight: "8px" }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                className="
+                              Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter                          "
+                                onClick={closeTitleEdit}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
+                        </Form>
+                      </div>
+                    ) : (
+                      <p
+                        onClick={handleEditTitle}
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          gap: "8px",
+                          alignItems: "center",
+                        }}
+                        title="Edit"
+                      >
+                        <span>{formState.productTitle}</span>
+                        <span>
+                          <EditIcon height={25} width={25} />
+                        </span>
+                      </p>
+                    )}
                   </InlineStack>
                 ) : (
                   <BlockStack gap="200">

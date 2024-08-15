@@ -29,7 +29,7 @@
                 {{ selected_product.media[1] | image_url }} {{ selected_product.media[1].width }}w
               "
               src="{{ selected_product.featured_image.src | image_url: width: 533 }}"
-              alt=""
+              alt="{{ selected_product.title }}"
               class="motion-reduce"
               loading="lazy"
               width="{{ selected_product.media[1].width }}"
@@ -40,20 +40,36 @@
             <h2>
               <a href="{{selected_product.url}}">
                 {{ selected_product.title }}
-                </a>
+              </a>
             </h2>
             {% render 'price', product: selected_product, price_class: '' %}
-            <p>
-              {{ selected_product.content }}
-            </p>
-            {% if selected_product.available == false %}
-              <button disabled="true" class="product-form__submit button button--full-width" style="cursor: not-allowed;">Add to cart</button>
-              <span>Out of stock, better luck next time!</span>
-            {% else %}
-              <button id="cart-submit-button" class="product-form__submit button button--full-width" onclick="addToCart({{selected_product.variants.first.id}})">
-                Add to cart
-              </button>
+            <p>{{ selected_product.content }}</p>
+
+            {% if selected_product.variants.size > 1 %}
+              <div class="product-variants">
+                {% for variant in selected_product.variants %}
+                  <div
+                    class="variant-option {% if variant.available %}available{% else %}unavailable{% endif %}"
+                    data-variant-id="{{ variant.id }}"
+                    data-available="{{ variant.available }}"
+                    onclick="selectVariant('{{ variant.id }}', this)"
+                    title="{% unless variant.available %}Out of stock{% endunless %}"
+                    onmouseenter="updateAddToCartButton()"
+                    onmouseleave="updateAddToCartButton()"
+                  >
+                    {{ variant.title }}
+                  </div>
+                {% endfor %}
+              </div>
             {% endif %}
+
+            <button
+              id="cart-submit-button"
+              class="product-form__submit button button--full-width"
+              onclick="addToCart({{selected_product.id}})"
+            >
+              Add to cart
+            </button>
           </div>
         {% else %}
           <p>No products available in this collection.</p>
@@ -63,12 +79,74 @@
   </div>
 </main>
 
+<style>
+  .product-variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .variant-option {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    flex: 1 1 auto;
+  }
+
+  .variant-option.available {
+    background-color: #e0ffe0;
+  }
+
+  .variant-option.unavailable {
+    background-color: #ffe0e0;
+    cursor: not-allowed;
+  }
+
+  .variant-option:hover:not(.unavailable) {
+    background-color: #d0f0d0;
+  }
+</style>
+
 <script defer>
+  let selectedVariantId = null;
+
+  function selectVariant(id, element) {
+    var submitButton = document.getElementById('cart-submit-button');
+    const allVariants = document.querySelectorAll('.variant-option');
+    const unavailableVariants = document.querySelectorAll('.variant-option.unavailable.selected');
+    console.log(unavailableVariants);
+
+    allVariants.forEach((el) => {
+      el.classList.remove('selected');
+    });
+
+    element.classList.add('selected');
+    selectedVariantId = id;
+  }
+
+  function updateAddToCartButton() {
+    const unavailableVariants = document.querySelectorAll('.variant-option.unavailable.selected');
+    const submitButton = document.getElementById('cart-submit-button');
+    if (unavailableVariants.length > 0) {
+      submitButton.setAttribute('aria-disabled', 'true');
+    }
+    if (!unavailableVariants.length || unavailableVariants.length === 0) {
+      submitButton.removeAttribute('aria-disabled');
+    }
+  }
   async function addToCart(id) {
+    const selectedVariantId = document.querySelector('.variant-option.selected')?.dataset.variantId;
+    const variantElement = document.querySelector(`.variant-option[data-variant-id="${selectedVariantId}"]`);
     var cart = document.querySelector('cart-notification') || document.querySelector('cart-drawer');
     var submitButton = document.getElementById('cart-submit-button');
-    console.log(cart);
-    if (submitButton.getAttribute('aria-disabled') === 'true') return;
+    if (variantElement && variantElement.dataset.available === 'false') {
+      submitButton.setAttribute('aria-disabled', 'true');
+      submitButton.classList.add('loading');
+      return;
+    }
+
     submitButton.setAttribute('aria-disabled', 'true');
     submitButton.classList.add('loading');
 
@@ -82,14 +160,13 @@
         cart.getSectionsToRender().map((section) => section.id)
       );
       formData.append('sections_url', window.location.pathname);
-      formData.append('product_id', id);
+      formData.append('product_id', selectedVariantId ? selectedVariantId : id);
       formData.append('quantity', 1);
       formData.append('form_type', 'product');
       formData.append('id', '49292039422298');
       formData.append('section-id', 'template--23229878862170__main');
       cart.setActiveElement(document.activeElement);
     }
-
     config.body = formData;
 
     fetch(`${routes.cart_add_url}`, config)

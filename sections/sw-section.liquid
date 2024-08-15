@@ -1,24 +1,110 @@
-<div class="page-width sw-section__wraper">
-  <div class="sw-section__content">
-    <div class="sw-section-image-wrapper">
-      <img height="{{section.settings.image-height}}" width="100%" src="{{ section.settings.background_image | image_url: 'master' }}" alt="">
-      <div class="sw-section-text">
-        {% for block in section.blocks %}
-          {% case block.name %}
-            {% when 'heading' %}
-              <h2 class="sw-section-heading" style="text-align: {{ section.settings.text_alignment }}">
-                {{ block.settings.heading }}
-              </h2>
-            {% when 'text-area' %}
-              <textarea name="{{block.id}}" id="{{block.id}}"> {{block.settings.text_area}}</textarea>
-            {% when 'link' %}
-              <a href="{{block.settings.link_url}}" class="sw-section-link">{{ block.settings.link_text }}</a>
-          {% endcase %}
-        {% endfor %}
-      </div>
+{% assign image_height = section.settings['image-height'] %}
+{% assign text_alignment = section.settings.text_alignment %}
+{% assign background_image = section.settings.background_image %}
+{% assign image_overlay_opacity = section.settings.image_overlay_opacity | divided_by: 100.0 %}
+{% assign text_wrapper_opacity = section.settings.text_wrapper_opacity | divided_by: 100.0 %}
+
+<section
+  class="sw-section"
+  style="
+    {%- unless section.settings.product_description_video -%}
+      background: linear-gradient(
+          rgba(0, 0, 0, {{ image_overlay_opacity }}),
+          rgba(0, 0, 0, {{ image_overlay_opacity }})
+        ),
+        url({{ background_image | img_url: 'master' }}) no-repeat center center;
+      background-size: cover;
+      background-position: center;
+    {%- endunless -%}
+    height: {{ image_height }};
+  "
+>
+  {% if section.settings.product_description_video %}
+    <video style="position: relative;"  controls >
+      <source src="{{section.settings.product_description_video}} type='video/mp4'">
+  {% endif %}
+  
+  {% if section.blocks.size %}
+    <div
+      class="sw-section__content"
+      style="
+        text-align: {{ text_alignment }};
+        background-color: rgba({{ section.settings.text_wrapper_background }}, {{ text_wrapper_opacity }});
+        {%- if section.settings.text_shadow -%}
+          text-shadow: 4px 4px 2px rgb(147 55 55 / 60%);
+        {%- endif -%}
+      "
+    >
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'heading' %}
+            <h1 style="color:{{ section.settings.text_color }}">{{ block.settings.heading }}</h1>
+          {% when 'text-area' %}
+            <p style="color:{{ section.settings.text_color }}">
+              {{ block.settings.text_area }}
+            </p>
+          {% when 'link' %}
+            <a href="{{ block.settings.link_url }}" class="cta-link">{{ block.settings.link_text }}</a>
+        {% endcase %}
+      {% endfor %}
+      {% if section.settings.product_description_video %}
+        </video>
+      {% endif %}
     </div>
-  </div>
-</div>
+  {% endif %}
+</section>
+
+<style>
+  .sw-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .sw-section__content {
+    padding-inline: 20px;
+    background: #0c0c0c;
+    width: max-content;
+    height: max-content;
+    min-width: 500px;
+  }
+
+  .cta-link {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 10px;
+    background-color: #0c0c0c;
+    outline: 1px solid white;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+
+  .cta-link:hover {
+    background-color: white;
+    color: black;
+  }
+
+  p {
+    margin-block-start: 0;
+    margin-block-end: 16px;
+  }
+
+  a {
+    margin: 14px;
+  }
+   
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  h1 {
+    margin: 0; /* Adjust as needed */
+  }
+</style>
 
 {% schema %}
 {
@@ -32,24 +118,83 @@
       "label": "Background Image"
     },
     {
+      "type": "video_url",
+      "id": "product_description_video",
+      "label": "Product description video",
+      "accept": ["youtube", "vimeo"],
+      "info": "If a video is added, any added image will be ignored."
+    },
+    {
       "type": "select",
       "id": "image-height",
-      "label": "Image size",
+      "label": "Banner Size",
       "default": "80vh",
       "options": [
         {
           "value": "80vh",
-          "label": "large"
+          "label": "Large"
         },
         {
           "value": "50vh",
-          "label": "medium"
+          "label": "Medium"
         },
         {
           "value": "30vh",
-          "label": "small"
+          "label": "Small"
         }
       ]
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "Image Overlay Opacity",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "text_wrapper_background",
+      "label": "Text Wrapper Background",
+      "default": "0,0,0",
+      "options": [
+        {
+          "value": "0,0,0",
+          "label": "Black"
+        },
+        {
+          "value": "255,255,255",
+          "label": "White"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF",
+      "options": [
+        {
+          "value": "#000000",
+          "label": "Black"
+        },
+        {
+          "value": "#FFFFFF",
+          "label": "White"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "text_wrapper_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "Text Wrapper Opacity",
+      "default": 100
     },
     {
       "type": "select",
@@ -70,6 +215,12 @@
           "label": "Right"
         }
       ]
+    },
+    {
+      "type": "checkbox",
+      "id": "text_shadow",
+      "label": "Enable Text Shadow",
+      "default": false
     }
   ],
   "blocks": [
@@ -88,7 +239,7 @@
     },
     {
       "type": "text-area",
-      "limit": 2,
+      "limit": 1,
       "name": "Text",
       "settings": [
         {
@@ -96,13 +247,29 @@
           "id": "text_area",
           "label": "Text",
           "default": "Enter text here"
+        },
+        {
+          "type": "select",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#FFFFFF",
+          "options": [
+            {
+              "value": "#000000",
+              "label": "Black"
+            },
+            {
+              "value": "#FFFFFF",
+              "label": "White"
+            }
+          ]
         }
       ]
     },
     {
       "type": "link",
       "limit": 2,
-      "name": "cta-link",
+      "name": "CTA Link",
       "settings": [
         {
           "type": "text",
@@ -120,7 +287,7 @@
   ],
   "presets": [
     {
-      "name": "sw-section"
+      "name": "Default"
     }
   ]
 }
