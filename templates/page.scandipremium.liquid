@@ -20,20 +20,20 @@
           <div class="product">
             <img
               srcset="
-                {%- if selected_product.media[1].width >= 165 -%}{{ selected_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
-                {%- if selected_product.media[1].width >= 360 -%}{{ selected_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}
-                {%- if selected_product.media[1].width >= 533 -%}{{ selected_product.media[1] | image_url: width: 533 }} 533w,{%- endif -%}
-                {%- if selected_product.media[1].width >= 720 -%}{{ selected_product.media[1] | image_url: width: 720 }} 720w,{%- endif -%}
-                {%- if selected_product.media[1].width >= 940 -%}{{ selected_product.media[1] | image_url: width: 940 }} 940w,{%- endif -%}
-                {%- if selected_product.media[1].width >= 1066 -%}{{ selected_product.media[1] | image_url: width: 1066 }} 1066w,{%- endif -%}
-                {{ selected_product.media[1] | image_url }} {{ selected_product.media[1].width }}w
+                {%- if selected_product.media[0].width >= 165 -%}{{ selected_product.media[0] | image_url: width: 165 }} 165w,{%- endif -%}
+                {%- if selected_product.media[0].width >= 360 -%}{{ selected_product.media[0] | image_url: width: 360 }} 360w,{%- endif -%}
+                {%- if selected_product.media[0].width >= 533 -%}{{ selected_product.media[0] | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if selected_product.media[0].width >= 720 -%}{{ selected_product.media[0] | image_url: width: 720 }} 720w,{%- endif -%}
+                {%- if selected_product.media[0].width >= 940 -%}{{ selected_product.media[0] | image_url: width: 940 }} 940w,{%- endif -%}
+                {%- if selected_product.media[0].width >= 1066 -%}{{ selected_product.media[0] | image_url: width: 1066 }} 1066w,{%- endif -%}
+                {{ selected_product.media[0] | image_url }} {{ selected_product.media[0].width }}w
               "
-              src="{{ selected_product.featured_image.src | image_url: width: 533 }}"
+              src="{{ selected_product.media[0].src | image_url: width: 533 }}"
               alt="{{ selected_product.title }}"
               class="motion-reduce"
               loading="lazy"
-              width="{{ selected_product.media[1].width }}"
-              height="{{ selected_product.media[1].height }}"
+              width="{{ selected_product.media[0].width }}"
+              height="{{ selected_product.media[0].height }}"
             >
           </div>
           <div class="cta">
@@ -164,7 +164,7 @@
       formData.append('product_id', selectedVariantId ? selectedVariantId : id);
       formData.append('quantity', 1);
       formData.append('form_type', 'product');
-      formData.append('id', '49292039422298');
+      formData.append('id', selectedVariantId ? selectedVariantId : id);
       formData.append('section-id', 'template--23229878862170__main');
       cart.setActiveElement(document.activeElement);
     }

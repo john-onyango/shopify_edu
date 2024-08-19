@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { json } from "@remix-run/node";
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
@@ -11,17 +12,23 @@ import {
   Text,
   Icon,
   InlineStack,
+  Button,
+  TextField,
+  Spinner,
 } from "@shopify/polaris";
+import React from "react";
 
 import { getQRCodes } from "../models/QRCode.server";
 import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
+import { getAUthUrl, getTweets } from "./twitterserver";
 
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
   const qrCodes = await getQRCodes(session.shop, admin.graphql);
-
+  const url = await getAUthUrl();
   return json({
     qrCodes,
+    url
   });
 }
 
@@ -102,13 +109,42 @@ const QRTableRow = ({ qrCode }) => (
 export default function Index() {
   const { qrCodes } = useLoaderData();
   const navigate = useNavigate();
+  const [twitterHandle, setTwitterHandle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConnect = async () => {
+    'use server'
+    console.log(twitterHandle);
+    if (twitterHandle) {
+      setIsLoading(true);
+      try {
+        const success = await getTweets(twitterHandle);
+        if (success) {
+          setStatusMessage("Connection successful!");
+          console.log(success); 
+
+        } else {
+          setStatusMessage("Connection failed. Please try again.");
+        }
+      } catch (error) {
+        setStatusMessage("Connection failed. Please try again.");
+          console.log(error); 
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setStatusMessage("Please enter a Twitter handle");
+    }
+  };
+ 
 
   return (
     <Page>
       <ui-title-bar title="QR codes">
-        <button variant="primary" onClick={() => navigate("/app/qrcodes/new")}>
+        <Button primary onClick={() => navigate("/app/qrcodes/new")}>
           Create QR code
-        </button>
+        </Button>
       </ui-title-bar>
       <Layout>
         <Layout.Section>
@@ -119,6 +155,43 @@ export default function Index() {
               <QRTable qrCodes={qrCodes} />
             )}
           </Card>
+        </Layout.Section>
+        <Layout.Section>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              width:"50%"
+            }}
+          >
+            <h1
+              style={{
+                fontWeight: "bold",
+                fontSize: "20px",
+              }}
+            >
+              Add Twitter Feeds to Homepage
+            </h1>
+            <TextField
+              value={twitterHandle}
+              onChange={(value) => setTwitterHandle(value)}
+              placeholder="Enter Twitter handle"
+            />
+            <Button onClick={handleConnect} loading={isLoading}>
+              {isLoading ? "Connecting..." : "Connect"}
+            </Button>
+            <div
+              style={{
+                marginTop: "10px",
+                color: statusMessage.startsWith("Connection successful")
+                  ? "green"
+                  : "red",
+              }}
+            >
+              {statusMessage}
+            </div>
+          </div>
         </Layout.Section>
       </Layout>
     </Page>

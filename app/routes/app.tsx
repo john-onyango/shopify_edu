@@ -12,14 +12,14 @@ import { authenticate } from "../shopify.server";
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+ const {session} = await authenticate.admin(request);
 
-  return json({ apiKey: process.env.SHOPIFY_API_KEY || "" });
+  return json({ apiKey: process.env.SHOPIFY_API_KEY || "" ,session:session });
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData<typeof loader>();
-
+  const { apiKey,session } = useLoaderData<typeof loader>();
+  console.log(session);
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
@@ -28,7 +28,7 @@ export default function App() {
         </Link>
         <Link to="/app/additional">Additional page</Link>
       </NavMenu>
-      <Outlet />
+      <Outlet context={{session:session}} />
     </AppProvider>
   );
 }

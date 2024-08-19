@@ -55,9 +55,6 @@
   margin: 2rem 0 0 0;
 }
 
-.customer .field:first-of-type {
-  margin-top: 0;
-}
 
 /* Customer Table */
 .customer table {

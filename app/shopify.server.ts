@@ -10,6 +10,20 @@ import prisma from "./db.server";
 import * as Shopify from "@shopify/shopify-api";
 
 const shopify = shopifyApp({
+  api: {
+    apiVersion: ApiVersion.July24,
+    restResources,
+    billing: undefined,
+    apiKey: process.env.SHOPIFY_API_KEY,
+    apiSecretKey: process.env.SHOPIFY_API_SECRET,
+    isCustomStoreApp: true,
+    scopes: [
+      'write_customers',
+      'write_products'
+    ],
+    isEmbeddedApp: false,
+    hostName: process.env.HOST_NAME,  
+  },
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
   apiVersion: ApiVersion.July24,
@@ -28,6 +42,7 @@ const shopify = shopifyApp({
 });
 
 export const shopifyClient = Shopify.shopifyApi({
+  
   apiKey: process.env.SHOPIFY_API_KEY,
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
   apiVersion: ApiVersion.July24,
