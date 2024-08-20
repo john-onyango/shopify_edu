@@ -1,10 +1,10 @@
 {{ 'scandipremium-page.css' | asset_url | stylesheet_tag }}
 {{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
 {{ 'component-rating.css' | asset_url | stylesheet_tag }}
-{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-card.css' | asset_url | stylesheet_tag }} 
 
 <main class="scandipremium-main page-width">
-  {% section 'image-banner' %}
+   {% section 'image-banner' %}
   <div class="scandipremium-promotion">
     {% for collection in collections %}
       {% if collection.title == 'Classic' %}
