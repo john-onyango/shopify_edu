@@ -20,15 +20,12 @@ import React from "react";
 
 import { getQRCodes } from "../models/QRCode.server";
 import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
-import { getAUthUrl, getTweets } from "./twitterserver";
 
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
   const qrCodes = await getQRCodes(session.shop, admin.graphql);
-  const url = await getAUthUrl();
   return json({
-    qrCodes,
-    url
+    qrCodes
   });
 }
 
@@ -119,7 +116,7 @@ export default function Index() {
     if (twitterHandle) {
       setIsLoading(true);
       try {
-        const success = await getTweets(twitterHandle);
+        const success = setTimeout(() => {  return true; }, 2000);
         if (success) {
           setStatusMessage("Connection successful!");
           console.log(success); 

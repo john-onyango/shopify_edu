@@ -4,7 +4,6 @@ import { authenticate, shopifyClient } from "../shopify.server";
 export const action = async ({ request }: ActionFunctionArgs) => {
   if (request.method === "POST") {
     const { session } = await authenticate.admin(request);
-
     const body = await request.formData();
     const { productId, newtitle } = Object.fromEntries(body);
     const id = Number(productId.split("/").pop());
