@@ -30,6 +30,7 @@ async function fetchPosts(handle) {
       });
     } catch (error) {
       console.error('Error fetching posts:', error);
+      
     }
   }
 
@@ -41,6 +42,7 @@ async function fetchPosts(handle) {
 </script>
 
 {% schema %}
+
 {
   "name": "twitter-posts",
   "tag": "section",
@@ -58,4 +60,5 @@ async function fetchPosts(handle) {
     }
   ]
 }
+
 {% endschema %}
