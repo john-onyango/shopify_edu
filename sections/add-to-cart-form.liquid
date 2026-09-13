@@ -14,14 +14,7 @@
       <span class="product-form__error-message"></span>
     </div>
 
-    {%-
-      form 'product',
-      product,
-      id: {{ section_id }},
-      class: 'form',
-      novalidate: 'novalidate',
-      data-type: ''
-    -%}
+    {%- form nil, class: 'form', novalidate: 'novalidate', data-type: '' -%}
       <input
         type="hidden"
         name="id"
@@ -74,4 +67,21 @@
         </button>
       </div>
     {%- endform -%}
-  </product-form>
+  </product-form>{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {%-
+          form 'product',
+          product,
+          id: {{ section_id }},
+          class: 'form',
+          novalidate: 'novalidate',
+          data-type: ''
+        -%}
+  to: "{%- form nil, class: 'form', novalidate: 'novalidate', data-type: '' -%}"
+  position: 1272..1344
+{%- endcomment -%}

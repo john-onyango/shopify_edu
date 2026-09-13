@@ -1,1 +1,11 @@
-{% render 'card-product',  =card_product:product %}
+{% render 'card-product', card_product: product %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% render 'card-product',  =card_product:product %}"
+  to: "{% render 'card-product', card_product: product %}"
+  position: 0..50
+{% endcomment %}
